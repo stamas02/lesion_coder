@@ -17,7 +17,6 @@ setup(
         'torch==1.9.1+cu111',
         'chvision==0.10.1+cu111 ',
         'torchaudio==0.9.1',
-        'matplotlib,
         'pandas',
         'tqdm'
     ]
