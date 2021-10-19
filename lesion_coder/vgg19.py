@@ -4,14 +4,14 @@ import os
 from lesion_coder.web_helper import download_url
 from lesion_coder.utils import get_test_transform
 from PIL import Image
-import numpy as np
+from torchvision.utils import save_image
+from lesion_coder.model import BaseAutoEncoder
 
 MODEL_FILE = "vgg19_skin_auto_encoder.pt"
 MODEL_LINK = "https://huggingface.co/stamas01/vgg19_skin_auto_encoder/resolve/main/vgg19_skin_auto_encoder.pt"
 
 
 def get_model():
-    return torch.load("../log/20211019-142923/fist_test-model.pt")
     if not os.path.isfile(MODEL_FILE):
         print("Downloading pretrained model file. This will only happen at first use!")
         download_url(MODEL_LINK, MODEL_FILE)
@@ -24,16 +24,13 @@ def main(image):
     img = Image.open(image)
     img = transform(img).to(device)
 
-    model = get_model().to(device)
+    model = BaseAutoEncoder().to(device)
+    model.load_state_dict(torch.load(MODEL_FILE))
     model.eval()
-    outputs = model(img.unsqueeze(0))[0].detach().cpu().numpy()
-    outputs = (outputs+1)//2
-    reconstruction = Image.fromarray(np.uint8(np.rollaxis(outputs, 0,3)))
-    reconstruction.show()
 
-    d  =7
-
-
+    outputs = model(img.unsqueeze(0))
+    save_image(outputs, "output.jpg", nrow=1, normalize=True)
+    print ("result is saved to output.jpg")
 
 
 

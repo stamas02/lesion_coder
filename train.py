@@ -79,7 +79,8 @@ def train(dataset_dir, image_x, image_y, lr, batch_size, epoch, log_dir, log_nam
                                             'val-loss': val_loss}, ignore_index=True)
 
     df_train_log.to_csv(os.path.join(log_dir, log_name + "-train_log.csv"), index=False, header=True)
-    torch.save(model, os.path.join(log_dir, log_name + "-model.pt"))
+    torch.save(model.state_dict(), os.path.join(log_dir, log_name + "-model.pt"))
+
 
     if do_test:
         test(model_path=os.path.join(log_dir, log_name + "-model.pt"),

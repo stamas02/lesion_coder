@@ -12,7 +12,7 @@ class DownloadProgressBar(tqdm):
 
 
 def download_url(url, output_path):
-    if not os.path.isdir(os.path.dirname(output_path)):
+    if not os.path.isdir(os.path.dirname(output_path)) and os.path.dirname(output_path) != '' :
         os.mkdir(os.path.dirname(output_path))
 
     with DownloadProgressBar(unit='B', unit_scale=True,

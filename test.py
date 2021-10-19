@@ -7,6 +7,7 @@ import argparse
 import os
 from tqdm import tqdm
 from torchvision.utils import save_image
+from lesion_coder.model import BaseAutoEncoder
 
 
 IMG_DIR = "ISIC_2019_Training_Input"
@@ -17,8 +18,8 @@ def test(model_path, dataset_dir, image_x, image_y, test_split, val_split):
     log_dir = os.path.dirname(model_path)
     device = torch.device("cuda")
 
-
-    model = torch.load(model_path).to(device)
+    model = BaseAutoEncoder().to(device)
+    model.load_state_dict(torch.load(model_path))
     model.eval()
 
     df = pd.read_csv(os.path.join(dataset_dir, CSV_FILE))
