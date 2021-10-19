@@ -1,6 +1,6 @@
-from src import utils
-from src.dataset import ImageData
-from src.model import BaseAutoEncoder
+from lesion_coder import utils
+from lesion_coder.dataset import ImageData
+from lesion_coder.model import BaseAutoEncoder
 import pandas as pd
 import torch
 import torch.nn as nn

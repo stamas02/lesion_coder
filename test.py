@@ -1,12 +1,11 @@
-from src import utils
-from src.dataset import ImageData
+from lesion_coder import utils
+from lesion_coder.dataset import ImageData
 import pandas as pd
 import torch
 import torch.nn as nn
 import argparse
 import os
 from tqdm import tqdm
-import time
 from torchvision.utils import save_image
 
 
@@ -18,7 +17,8 @@ def test(model_path, dataset_dir, image_x, image_y, test_split, val_split):
     log_dir = os.path.dirname(model_path)
     device = torch.device("cuda")
 
-    model = torch.load(model_path)
+
+    model = torch.load(model_path).to(device)
     model.eval()
 
     df = pd.read_csv(os.path.join(dataset_dir, CSV_FILE))
