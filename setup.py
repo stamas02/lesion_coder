@@ -14,9 +14,6 @@ setup(
     author='Tamas Suveges',
     packages=find_packages(include=['lesion_coder']),
     install_requires = [
-        'torch==1.9.1+cu111',
-        'chvision==0.10.1+cu111 ',
-        'torchaudio==0.9.1',
         'pandas',
         'tqdm'
     ]
