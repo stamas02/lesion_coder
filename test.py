@@ -5,7 +5,6 @@ import torch
 import torch.nn as nn
 import argparse
 import os
-import numpy as np
 from tqdm import tqdm
 import time
 from torchvision.utils import save_image
@@ -57,6 +56,10 @@ def parseargs():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                      description='Evaluate model.')
     # Dataset Arguments
+    parser.add_argument("--model-path", "-m",
+                        type=str,
+                        help='String Value - path to the model file.',
+                        )
     parser.add_argument("--dataset-dir", "-d",
                         type=str,
                         help='String Value - The folder where the dataset is downloaded using get_dataset.py',
@@ -67,6 +70,12 @@ def parseargs():
     parser.add_argument("--image_y", type=int,
                         default=225,
                         help="Integer Value - Height of the image that should be resized to.")
+    parser.add_argument("--val-split", type=float,
+                        default=0.2,
+                        help="Floating Point Value - The percentage of data to be used for validation.")
+    parser.add_argument("--test-split", type=float,
+                        default=0.2,
+                        help="Floating Point Value - The percentage of data to be used for test.")
 
     args = parser.parse_args()
     return args
@@ -74,7 +83,4 @@ def parseargs():
 
 if __name__ == '__main__':
     args = parseargs()
-    time_str = time.strftime("%Y%m%d-%H%M%S")
-    args.log_dir = os.path.join(args.log_dir, time_str)
-    os.makedirs(args.log_dir)
     test(**args.__dict__)

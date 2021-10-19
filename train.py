@@ -69,7 +69,7 @@ def train(dataset_dir, image_x, image_y, lr, batch_size, epoch, log_dir, log_nam
                 loss = criterion(outputs, images)
                 if i == 0:
                     viz_images = torch.cat([outputs, images], axis=0).cpu()
-                    viz_file = os.path.join(log_dir, log_name + f"{_epoch}_viz.png")
+                    viz_file = os.path.join(log_dir, log_name + f"{_epoch:03d}_viz.png")
                     save_image(viz_images, viz_file, nrow=viz_images.shape[0]//2, normalize = True)
 
                 val_loss = val_loss * (1 - (1 / (i + 1))) + loss.item() * (1 / (i + 1))
