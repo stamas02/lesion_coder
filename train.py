@@ -1,17 +1,15 @@
 from src import utils
 from src.dataset import ImageData
 from src.model import BaseAutoEncoder
-from test import test
 import pandas as pd
 import torch
 import torch.nn as nn
 import argparse
 import os
-import numpy as np
 from tqdm import tqdm
 import time
 from torchvision.utils import save_image
-from torchvision import transforms
+from test import test
 
 IMG_DIR = "ISIC_2019_Training_Input"
 CSV_FILE = "ISIC_2019_Training_GroundTruth.csv"
@@ -23,9 +21,6 @@ def read_datasets(dataset_files):
         _df = pd.read_csv(dataset_file)
         df = pd.concat([df, _df], ignore_index=True)
     return df
-
-
-
 
 
 def train(dataset_dir, image_x, image_y, lr, batch_size, epoch, log_dir, log_name, do_test, val_split, test_split, net):
@@ -73,15 +68,9 @@ def train(dataset_dir, image_x, image_y, lr, batch_size, epoch, log_dir, log_nam
                 outputs = model(images)
                 loss = criterion(outputs, images)
                 if i == 0:
-                    # outputs = rearrange(outputs, 'k b c h w -> b k c h w')
-                    # outputs = torch.cat((images[:, None, :], outputs), 1)
-                    # outputs = outputs.reshape(-1, *outputs.size()[2::])
-                    transform = transforms.Normalize(mean=[-0.5 / 0.5, -0.5 / 0.5, -0.5 / 0.5],
-                                                     std=[1 / 0.5, 1 / 0.5, 1 / 0.5])
-                    outputs = ([transform(t).cpu() for t in outputs])
-                    images = ([transform(t).cpu() for t in images])
-                    save_image(outputs, os.path.join(log_dir, log_name + f"{_epoch}_rec.png"), nrow=4)
-                    save_image(images, os.path.join(log_dir, log_name + f"{_epoch}_ori.png"), nrow=4)
+                    viz_images = torch.cat([outputs, images], axis=0).cpu()
+                    viz_file = os.path.join(log_dir, log_name + f"{_epoch}_viz.png")
+                    save_image(viz_images, viz_file, nrow=viz_images.shape[0]//2, normalize = True)
 
                 val_loss = val_loss * (1 - (1 / (i + 1))) + loss.item() * (1 / (i + 1))
 
@@ -92,14 +81,13 @@ def train(dataset_dir, image_x, image_y, lr, batch_size, epoch, log_dir, log_nam
     df_train_log.to_csv(os.path.join(log_dir, log_name + "-train_log.csv"), index=False, header=True)
     torch.save(model, os.path.join(log_dir, log_name + "-model.pt"))
 
-    #if do_test:
-    #    test(model_path=os.path.join(log_dir, log_name + "-model.pt"),
-    #         dataset_dir=dataset_dir,
-    #         batch_size=batch_size,
-    #         image_x=image_x,
-    #         image_y=image_y,
-    #         test_split = test_split,
-    #         val_split = val_split)
+    if do_test:
+        test(model_path=os.path.join(log_dir, log_name + "-model.pt"),
+            dataset_dir=dataset_dir,
+            image_x=image_x,
+            image_y=image_y,
+            test_split = test_split,
+            val_split = val_split)
 
 
 def parseargs():

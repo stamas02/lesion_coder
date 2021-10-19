@@ -1,48 +1,43 @@
 from torchvision import transforms
 from PIL import Image
-from torch import nn
-from torch.nn import functional as F
-import torch
 import numpy as np
 
 
-def criterion(x, y):
-    return torch.mean(torch.square(torch.subtract(x, y)))
+class TopTracker():
+    def __init__(self, top_k=5, extrema="min"):
+        self.items = []
+        self.scores = []
+        self.k = top_k
+        self.extrema = extrema
 
-#criterion = nn.L1Loss()
+        self.test = lambda a,b: a<b
 
-def class_decoder_loss(x, y, label):
-    reconstruction_losses = []
-    for example_idx, _ in enumerate(label):
-        for decoder_idx, _ in enumerate(x):
-            if label[example_idx] == decoder_idx:
-                reconstruction_losses.append(criterion(x[decoder_idx][example_idx], y[example_idx]))
-            else:
-                reconstruction_losses.append(criterion(x[decoder_idx][example_idx].detach(), y[example_idx]))
-                #econstruction_losses.append(torch.tensor(100).cuda())
+    def get_top_items(self):
+        if self.extrema == "min":
+            sorted_idx = np.argsort(self.scores)
+            return [self.items[i] for i in sorted_idx]
+        elif self.extrema == "max":
+            sorted_idx = np.argsort(self.scores)[::-1]
+            return [self.items[i] for i in sorted_idx]
 
-    reconstruction_losses = torch.reshape(torch.stack(reconstruction_losses), (len(label), len(x)))
-    #reconstruction_losses = torch.t(reconstruction_losses)
-    reconstruction_losses = torch.subtract(reconstruction_losses, 0.4)
-    reconstruction_losses = torch.mul(reconstruction_losses, 10)
-    loss = F.cross_entropy(torch.mul(reconstruction_losses, -1), label)
-    predictions = torch.min(reconstruction_losses, 1).indices.detach().cpu().numpy()
-    return loss, predictions
+    def add(self, score, item):
+        if len(self.items) < self.k:
+            self.items.append(item)
+            self.scores.append(score)
+        else:
+            if self.extrema == "min":
+                max_score_ind = np.argmax(self.scores)
+                if self.scores[max_score_ind] > score:
+                    self.scores[max_score_ind] = score
+                    self.items[max_score_ind] = item
+            elif self.extrema == "max":
+                min_score_ind = np.argmin(self.scores)
+                if self.scores[min_score_ind] > score:
+                    self.scores[min_score_ind] = score
+                    self.items[min_score_ind] = item
 
-def decoder_loss(x, y, label):
-    reconstruction_losses = []
-    reconstruction_losses_all = []
-    for example_idx, _ in enumerate(label):
-        for decoder_idx, _ in enumerate(x):
-            if label[example_idx] == decoder_idx:
-                reconstruction_losses_all.append(criterion(x[decoder_idx][example_idx], y[example_idx]))
-                reconstruction_losses.append(criterion(x[decoder_idx][example_idx], y[example_idx]))
-            else:
-                reconstruction_losses_all.append(criterion(x[decoder_idx][example_idx].detach(), y[example_idx]))
 
-    reconstruction_losses_all = torch.reshape(torch.stack(reconstruction_losses_all), (len(label), len(x)))
-    predictions = torch.min(reconstruction_losses_all, 1).indices.detach().cpu().numpy()
-    return torch.mean(torch.stack(reconstruction_losses)), predictions
+
 
 
 
