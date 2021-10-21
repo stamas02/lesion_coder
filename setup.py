@@ -15,6 +15,7 @@ setup(
     packages=find_packages(include=['lesion_coder']),
     install_requires = [
         'pandas',
-        'tqdm'
+        'tqdm',
+        'matplotlib'
     ]
 )
