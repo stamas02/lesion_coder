@@ -8,11 +8,14 @@ class BaseAutoEncoder(nn.Module):
         # For encoder load pretrained VGG19 model and remove layers upto relu4_1
         torch.hub._validate_not_a_forked_repo = lambda a, b, c: True
         self.vgg = torch.hub.load('pytorch/vision:v0.10.1', 'vgg19', pretrained=True)
-        self.vgg = nn.Sequential(*list(self.vgg.features.children())[:21])
+        self.vgg = nn.Sequential(*(list(self.vgg.features.children())+[self.vgg.avgpool]))
         # Create AdaIN layer
 
         # Use Sequential to define decoder [Just reverse of vgg with pooling replaced by nearest neigbour upscaling]
-        self.dec = nn.Sequential(nn.Conv2d(512, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), padding_mode='reflect' ),
+        self.dec = nn.Sequential(
+        nn.Upsample(scale_factor=2, mode='nearest'),
+        nn.Conv2d(512, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), padding_mode='reflect'),
+        nn.Conv2d(512, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), padding_mode='reflect' ),
         nn.ReLU(),
         nn.Upsample(scale_factor=2,mode='nearest'),
         nn.Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), padding_mode='reflect'),

@@ -1,7 +1,7 @@
 import argparse
 import os
 import zipfile
-from src import web_helper
+from lesion_coder import web_helper
 
 LINK_DATA = "https://isic-challenge-data.s3.amazonaws.com/2019/ISIC_2019_Training_Input.zip"
 LINK_LABELS = "https://isic-challenge-data.s3.amazonaws.com/2019/ISIC_2019_Training_GroundTruth.csv"

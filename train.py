@@ -10,6 +10,7 @@ from tqdm import tqdm
 import time
 from torchvision.utils import save_image
 from test import test
+import matplotlib.pyplot as plt
 
 IMG_DIR = "ISIC_2019_Training_Input"
 CSV_FILE = "ISIC_2019_Training_GroundTruth.csv"
@@ -23,7 +24,7 @@ def read_datasets(dataset_files):
     return df
 
 
-def train(dataset_dir, image_x, image_y, lr, batch_size, epoch, log_dir, log_name, do_test, val_split, test_split, net):
+def train(dataset_dir, image_x, image_y, lr, batch_size, epoch, log_dir, log_name, val_split, test_split, dim):
     df = pd.read_csv(os.path.join(dataset_dir, CSV_FILE))
     train_df, _, val_df = utils.slit_data(df, test_split, val_split)
 
@@ -44,8 +45,12 @@ def train(dataset_dir, image_x, image_y, lr, batch_size, epoch, log_dir, log_nam
 
     df_train_log = pd.DataFrame(columns=['epoch', 'train-loss', 'val-loss'])
 
-    for _epoch in range(epoch):
+    denormalize = utils.get_denormalize_transform()
 
+    plot_line([0, 1, 2, 3, 4, 5, 6], [1, 0.9, 0.7, 0.5, 0.4, 0.3, 0.11], "epoch", "train loss", "Training Loss",
+              log_dir)
+
+    for _epoch in range(epoch):
         model.train()
         train_loss = 0
         p_bar = tqdm(train_data_loader, desc=f"Training epoch {_epoch}")
@@ -69,8 +74,9 @@ def train(dataset_dir, image_x, image_y, lr, batch_size, epoch, log_dir, log_nam
                 loss = criterion(outputs, images)
                 if i == 0:
                     viz_images = torch.cat([outputs, images], axis=0).cpu()
+                    viz_images = [denormalize(i) for i in viz_images]
                     viz_file = os.path.join(log_dir, log_name + f"{_epoch:03d}_viz.png")
-                    save_image(viz_images, viz_file, nrow=viz_images.shape[0]//2, normalize = True)
+                    save_image(viz_images, viz_file, nrow=len(viz_images) // 2, normalize=False)
 
                 val_loss = val_loss * (1 - (1 / (i + 1))) + loss.item() * (1 / (i + 1))
 
@@ -79,16 +85,30 @@ def train(dataset_dir, image_x, image_y, lr, batch_size, epoch, log_dir, log_nam
                                             'val-loss': val_loss}, ignore_index=True)
 
     df_train_log.to_csv(os.path.join(log_dir, log_name + "-train_log.csv"), index=False, header=True)
+
+    plot_line(df_train_log["epoch"], ["train-loss"], "epoch", "train loss", "Training Loss", log_dir)
+    plot_line(df_train_log["epoch"], ["val-loss"], "epoch", "validation loss", "Validation Loss", log_dir)
+
     torch.save(model.state_dict(), os.path.join(log_dir, log_name + "-model.pt"))
 
+    test(model_path=os.path.join(log_dir, log_name + "-model.pt"),
+         dataset_dir=dataset_dir,
+         image_x=image_x,
+         image_y=image_y,
+         test_split=test_split,
+         val_split=val_split)
 
-    if do_test:
-        test(model_path=os.path.join(log_dir, log_name + "-model.pt"),
-            dataset_dir=dataset_dir,
-            image_x=image_x,
-            image_y=image_y,
-            test_split = test_split,
-            val_split = val_split)
+
+def plot_line(x, y, xlabel, ylabel, title, output_dir):
+    plt.rcParams.update({'font.size': 15})
+
+    f = plt.figure()
+    plt.plot(x, y)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    f.savefig(os.path.join(output_dir, title + ".pdf"), bbox_inches='tight')
+    f.savefig(os.path.join(output_dir, title + ".png"), bbox_inches='tight')
 
 
 def parseargs():
@@ -111,29 +131,28 @@ def parseargs():
                         default=6e-4,
                         help="Floating Point Value - Starting learning rate.")
     parser.add_argument("--batch_size", type=int,
-                        default=2,
+                        default=16,
                         help="Integer Value - The sizes of the batches during training.")
     parser.add_argument("--epoch", type=int,
-                        default=1,
+                        default=20,
                         help="Integer Value - Number of epoch.")
-    parser.add_argument('--do-test', action='store_true',
-                        help="Flag Boolean Value - If set testing will be carried out after training")
-    parser.add_argument('--net', type=str,
-                        help="String Value - Either test or gtp")
     parser.add_argument("--val-split", type=float,
                         default=0.2,
                         help="Floating Point Value - The percentage of data to be used for validation.")
     parser.add_argument("--test-split", type=float,
                         default=0.2,
                         help="Floating Point Value - The percentage of data to be used for test.")
-
+    parser.add_argument("--dim", type=float,
+                        default=512,
+                        help="Floating Point Value - Dimensionality of the feature space.")
     # Logging Arguments
     parser.add_argument("--log-dir", type=str,
+                        default="log/",
                         help="String Value - Path to the folder the log is to be saved.")
     parser.add_argument("--log-name", type=str,
                         default="deflog",
-                        help="String Value - This is a descriptive name of the method. "
-                             "Will be used in legends e.g. ROC curve")
+                        help="String Value - This is a descriptive name of the current test to help you distinguish "
+                             "the results.")
 
     args = parser.parse_args()
     return args

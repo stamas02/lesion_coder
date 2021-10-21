@@ -35,14 +35,18 @@ def test(model_path, dataset_dir, image_x, image_y, test_split, val_split):
     worst_top_5 = utils.TopTracker(5, extrema="max")
     best_top_5 = utils.TopTracker(5, extrema="min")
 
+    denormalize = utils.get_denormalize_transform()
+
     with torch.no_grad():
         for images, _ in tqdm(test_data_loader, desc="Predicting on test set"):
             images = images.to(device)
             outputs = model(images)
             loss = criterion(outputs, images)
+            images = [denormalize(i) for i in images]
+            outputs = [denormalize(i) for i in outputs]
             worst_top_5.add(item=torch.cat([images, outputs], axis=0), score=loss.cpu())
             best_top_5.add(item=torch.cat([images, outputs], axis=0), score=loss.cpu())
-    f = worst_top_5.get_top_items()
+
     viz_images = torch.cat(worst_top_5.get_top_items(), axis=0).cpu()
     viz_file = os.path.join(log_dir, log_name + "worst_top5.png")
     save_image(viz_images, viz_file, nrow=2, normalize=True)
@@ -66,16 +70,16 @@ def parseargs():
                         help='String Value - The folder where the dataset is downloaded using get_dataset.py',
                         )
     parser.add_argument("--image_x", type=int,
-                        default=300,
+                        default=224,
                         help="Integer Value - Width of the image that should be resized to.")
     parser.add_argument("--image_y", type=int,
-                        default=225,
+                        default=224,
                         help="Integer Value - Height of the image that should be resized to.")
     parser.add_argument("--val-split", type=float,
-                        default=0.2,
+                        default=0.1,
                         help="Floating Point Value - The percentage of data to be used for validation.")
     parser.add_argument("--test-split", type=float,
-                        default=0.2,
+                        default=0.1,
                         help="Floating Point Value - The percentage of data to be used for test.")
 
     args = parser.parse_args()

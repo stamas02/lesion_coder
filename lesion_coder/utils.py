@@ -1,6 +1,8 @@
 from torchvision import transforms
 from PIL import Image
 import numpy as np
+import torch.nn.functional as F
+import torch
 
 
 class TopTracker():
@@ -10,7 +12,7 @@ class TopTracker():
         self.k = top_k
         self.extrema = extrema
 
-        self.test = lambda a,b: a<b
+        self.test = lambda a, b: a < b
 
     def get_top_items(self):
         if self.extrema == "min":
@@ -35,11 +37,6 @@ class TopTracker():
                 if self.scores[min_score_ind] > score:
                     self.scores[min_score_ind] = score
                     self.items[min_score_ind] = item
-
-
-
-
-
 
 
 def get_train_transform(input_size):
@@ -79,6 +76,15 @@ def get_test_transform(input_size):
         transforms.Resize(input_size),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])])
+
+
+def get_denormalize_transform():
+    m = 0.5
+    s = 0.5
+    return transforms.Compose([
+        transforms.Normalize(mean=[-m / s, -m / s, -m / s], std=[1 / s, 1 / s, 1 / s])]
+    )
+
 
 
 def slit_data(df, test_split, val_split, seed=7):
