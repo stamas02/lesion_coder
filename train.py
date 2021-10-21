@@ -38,7 +38,7 @@ def train(dataset_dir, image_x, image_y, lr, batch_size, epoch, log_dir, log_nam
     val_data_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
 
     device = torch.device("cuda")
-    model = BaseAutoEncoder().to(device)
+    model = BaseAutoEncoder(512).to(device)
 
     optimizer = torch.optim.Adam(params=model.parameters(), lr=lr, weight_decay=1e-5)
     criterion = nn.MSELoss()
