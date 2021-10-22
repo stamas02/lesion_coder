@@ -77,4 +77,33 @@ The log and all the results will be saved to log/ dir unless it is changed throu
 
 #Results
 
+##Training
+![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/Training%20Loss.png)
+![validation_loss](https://github.com/stamas02/lesion_coder/blob/main/images/Validation%20Loss.png)
+
+##Reconstructions for different latent dimensions
+###64 DIM
+Reconstruction:
+
+![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim64-029_viz.png)
+
+Top 5 worst reconstructed in terms of MSE
+![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim64best_top5.png)
+![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim64worst_top5.png)
+
+###128 DIM
+![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim128-029_viz.png)
+
+Top 5 worst reconstructed in terms of MSE
+![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim64best_top5.png)
+![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim64worst_top5.png)
+
+###512 DIM
+![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim512-029_viz.png)
+
+Top 5 worst reconstructed in terms of MSE
+![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim64best_top5.png)
+![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim64worst_top5.png)
+
+
     
