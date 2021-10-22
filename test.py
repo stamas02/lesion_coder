@@ -9,11 +9,13 @@ from tqdm import tqdm
 from torchvision.utils import save_image
 from lesion_coder.model import BaseAutoEncoder
 
-
 IMG_DIR = "ISIC_2019_Training_Input"
 CSV_FILE = "ISIC_2019_Training_GroundTruth.csv"
+IMAGE_X = 128
+IMAGE_Y = 128
 
-def test(model_path, dataset_dir, image_x, image_y, dim, test_split, val_split):
+
+def test(model_path, dataset_dir, dim, test_split, val_split):
     log_name = os.path.basename(model_path).split("-")[0]
     log_dir = os.path.dirname(model_path)
     device = torch.device("cuda")
@@ -27,7 +29,7 @@ def test(model_path, dataset_dir, image_x, image_y, dim, test_split, val_split):
 
     test_files = [os.path.join(dataset_dir, IMG_DIR, f + ".jpg") for f in test_df.image]
 
-    test_dataset = ImageData(test_files, None, transform=utils.get_test_transform((image_x, image_y)))
+    test_dataset = ImageData(test_files, None, transform=utils.get_test_transform((IMAGE_X, IMAGE_Y)))
     test_data_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=1)
 
     criterion = nn.MSELoss()
@@ -57,7 +59,6 @@ def test(model_path, dataset_dir, image_x, image_y, dim, test_split, val_split):
     save_image(viz_images, viz_file, nrow=2, normalize=False)
 
 
-
 def parseargs():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                      description='Evaluate model.')
@@ -70,12 +71,6 @@ def parseargs():
                         type=str,
                         help='String Value - The folder where the dataset is downloaded using get_dataset.py',
                         )
-    parser.add_argument("--image_x", type=int,
-                        default=128,
-                        help="Integer Value - Width of the image that should be resized to.")
-    parser.add_argument("--image_y", type=int,
-                        default=128,
-                        help="Integer Value - Height of the image that should be resized to.")
     parser.add_argument("--val-split", type=float,
                         default=0.1,
                         help="Floating Point Value - The percentage of data to be used for validation.")

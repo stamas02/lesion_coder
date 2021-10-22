@@ -1,6 +1,6 @@
 # lesion_coder
 This is an Auto Encoder trained using torch trained to reconstruct skin lesion images.
-The model is based on the vgg19 architecture and accepts 224x224 images.
+The model is based on the vgg19 architecture and accepts 128X128 images.
 
 ##Install
 Install package using the following command:
@@ -64,8 +64,6 @@ Further Parameters:
 option name |       Description
 --- | --- 
 --dataset-dir, -d |     String Value - The folder where the dataset is downloaded using get_dataset.py.
---image_x |             Integer Value - Width of the image that should be resized to.
---image_y |             Integer Value - Height of the image that should be resized to.
 --lr |                  Floating Point Value - Starting learning rate.
 --batch_size |          Integer Value - The sizes of the batches during training.
 --epoch |               Integer Value - Number of epoch.
@@ -73,6 +71,10 @@ option name |       Description
 --test-split |          Floating Point Value - The percentage of data to be used for test.
 --log-dir |             String Value - Path to the folder the log is to be saved.
 --log-name |            String Value - This is a descriptive name of the current test to help you distinguish the results.
+--dim /                 Integer Value - Dimensionality of the feature space.
 
-    
+The log and all the results will be saved to log/ dir unless it is changed through the "log-dir" arg.
+
+#Results
+
     

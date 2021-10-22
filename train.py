@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 
 IMG_DIR = "ISIC_2019_Training_Input"
 CSV_FILE = "ISIC_2019_Training_GroundTruth.csv"
+IMAGE_X = 128
+IMAGE_Y = 128
 
 
 def read_datasets(dataset_files):
@@ -24,15 +26,15 @@ def read_datasets(dataset_files):
     return df
 
 
-def train(dataset_dir, image_x, image_y, lr, batch_size, epoch, log_dir, log_name, val_split, test_split, dim):
+def train(dataset_dir, lr, batch_size, epoch, log_dir, log_name, val_split, test_split, dim):
     df = pd.read_csv(os.path.join(dataset_dir, CSV_FILE))
     train_df, _, val_df = utils.slit_data(df, test_split, val_split)
 
     train_files = [os.path.join(dataset_dir, IMG_DIR, f + ".jpg") for f in train_df.image]
     val_files = [os.path.join(dataset_dir, IMG_DIR, f + ".jpg") for f in val_df.image]
 
-    train_dataset = ImageData(train_files, None, transform=utils.get_train_transform((image_x, image_y)))
-    val_dataset = ImageData(val_files, None, transform=utils.get_test_transform((image_x, image_y)))
+    train_dataset = ImageData(train_files, None, transform=utils.get_train_transform((IMAGE_X, IMAGE_Y)))
+    val_dataset = ImageData(val_files, None, transform=utils.get_test_transform((IMAGE_X, IMAGE_Y)))
 
     train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
     val_data_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
@@ -91,11 +93,8 @@ def train(dataset_dir, image_x, image_y, lr, batch_size, epoch, log_dir, log_nam
     plot_line(df_train_log["epoch"], df_train_log["train-loss"], "epoch", "train loss", "Training Loss", log_dir)
     plot_line(df_train_log["epoch"], df_train_log["val-loss"], "epoch", "validation loss", "Validation Loss", log_dir)
 
-
     test(model_path=os.path.join(log_dir, log_name + "-model.pt"),
          dataset_dir=dataset_dir,
-         image_x=image_x,
-         image_y=image_y,
          test_split=test_split,
          dim=dim,
          val_split=val_split)
@@ -121,12 +120,6 @@ def parseargs():
                         type=str,
                         help='String Value - The folder where the dataset is downloaded using get_dataset.py',
                         )
-    parser.add_argument("--image_x", type=int,
-                        default=128,
-                        help="Integer Value - Width of the image that should be resized to.")
-    parser.add_argument("--image_y", type=int,
-                        default=128,
-                        help="Integer Value - Height of the image that should be resized to.")
 
     # Training Arguments
     parser.add_argument("--lr", type=float,

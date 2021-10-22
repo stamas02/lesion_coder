@@ -9,6 +9,8 @@ import numpy as np
 
 MODEL_FILE = "vgg19_skin_auto_encoder.pt"
 MODEL_LINK = "https://huggingface.co/stamas01/vgg19_skin_auto_encoder/resolve/main/vgg19_skin_auto_encoder.pt"
+IMAGE_X = 128
+IMAGE_Y = 128
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
@@ -20,7 +22,7 @@ model = BaseAutoEncoder().to(device)
 model.load_state_dict(torch.load(MODEL_FILE))
 model.eval()
 model.to(device)
-transform = get_test_transform((224, 224))
+transform = get_test_transform((IMAGE_X, IMAGE_Y))
 denormalize = get_denormalize_transform()
 
 
