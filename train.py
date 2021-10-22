@@ -38,7 +38,7 @@ def train(dataset_dir, image_x, image_y, lr, batch_size, epoch, log_dir, log_nam
     val_data_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
 
     device = torch.device("cuda")
-    model = BaseAutoEncoder(512).to(device)
+    model = BaseAutoEncoder(dim).to(device)
 
     optimizer = torch.optim.Adam(params=model.parameters(), lr=lr, weight_decay=1e-5)
     criterion = nn.MSELoss()
@@ -86,16 +86,18 @@ def train(dataset_dir, image_x, image_y, lr, batch_size, epoch, log_dir, log_nam
 
     df_train_log.to_csv(os.path.join(log_dir, log_name + "-train_log.csv"), index=False, header=True)
 
-    plot_line(df_train_log["epoch"], ["train-loss"], "epoch", "train loss", "Training Loss", log_dir)
-    plot_line(df_train_log["epoch"], ["val-loss"], "epoch", "validation loss", "Validation Loss", log_dir)
-
     torch.save(model.state_dict(), os.path.join(log_dir, log_name + "-model.pt"))
+
+    plot_line(df_train_log["epoch"], df_train_log["train-loss"], "epoch", "train loss", "Training Loss", log_dir)
+    plot_line(df_train_log["epoch"], df_train_log["val-loss"], "epoch", "validation loss", "Validation Loss", log_dir)
+
 
     test(model_path=os.path.join(log_dir, log_name + "-model.pt"),
          dataset_dir=dataset_dir,
          image_x=image_x,
          image_y=image_y,
          test_split=test_split,
+         dim=dim,
          val_split=val_split)
 
 
@@ -120,10 +122,10 @@ def parseargs():
                         help='String Value - The folder where the dataset is downloaded using get_dataset.py',
                         )
     parser.add_argument("--image_x", type=int,
-                        default=224,
+                        default=128,
                         help="Integer Value - Width of the image that should be resized to.")
     parser.add_argument("--image_y", type=int,
-                        default=224,
+                        default=128,
                         help="Integer Value - Height of the image that should be resized to.")
 
     # Training Arguments
@@ -142,9 +144,9 @@ def parseargs():
     parser.add_argument("--test-split", type=float,
                         default=0.2,
                         help="Floating Point Value - The percentage of data to be used for test.")
-    parser.add_argument("--dim", type=float,
+    parser.add_argument("--dim", type=int,
                         default=512,
-                        help="Floating Point Value - Dimensionality of the feature space.")
+                        help="Integer Value - Dimensionality of the feature space.")
     # Logging Arguments
     parser.add_argument("--log-dir", type=str,
                         default="log/",
