@@ -2,7 +2,7 @@
 This is an Auto Encoder trained using torch trained to reconstruct skin lesion images.
 The model is based on the vgg19 architecture and accepts 128X128 images.
 
-##Install
+## Install
 Install package using the following command:
 
 ```
@@ -20,7 +20,7 @@ Notice! The above command might be obsolete or may not work for CUDA versions
 other than 11.1. Please visit the official pytorch website to find command that
 is specific to your system. https://pytorch.org/get-started/locally/
 
-##Usage
+## Usage
 Example usage:
 
 ```
@@ -44,7 +44,7 @@ reconstruction.show(title="Reconstruction")
 ```
     
     
-##Training
+## Training
 
 ### Downloading the dataset
 Download the ISIC 2019 Challange data:
@@ -75,35 +75,47 @@ option name |       Description
 
 The log and all the results will be saved to log/ dir unless it is changed through the "log-dir" arg.
 
-#Results
+# Results
 
-##Training
+## Training the model with 64 dim. 
 ![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/Training%20Loss.png)
 ![validation_loss](https://github.com/stamas02/lesion_coder/blob/main/images/Validation%20Loss.png)
 
-##Reconstructions for different latent dimensions
-###64 DIM
+## Reconstructions for different latent dimensions
+### 64 DIM
 Reconstruction:
 
 ![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim64-029_viz.png)
 
-Top 5 worst reconstructed in terms of MSE
-![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim64best_top5.png)
-![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim64worst_top5.png)
+Best/Worst:
 
-###128 DIM
+Top 5 worst (MSE)            |  Top 5 best (MSE)
+:-------------------------:|:-------------------------:
+![](https://github.com/stamas02/lesion_coder/blob/main/images/dim64best_top5.png)  |  ![](https://github.com/stamas02/lesion_coder/blob/main/images/dim64worst_top5.png)
+
+
+### 128 DIM
+Reconstruction:
+
 ![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim128-029_viz.png)
 
-Top 5 worst reconstructed in terms of MSE
-![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim64best_top5.png)
-![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim64worst_top5.png)
+Best/Worst:
 
-###512 DIM
+Top 5 worst (MSE)            |  Top 5 best (MSE)
+:-------------------------:|:-------------------------:
+![](https://github.com/stamas02/lesion_coder/blob/main/images/dim128best_top5.png)  |  ![](https://github.com/stamas02/lesion_coder/blob/main/images/dim128worst_top5.png)
+
+
+### 512 DIM
+Reconstruction:
+
 ![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim512-029_viz.png)
 
-Top 5 worst reconstructed in terms of MSE
-![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim64best_top5.png)
-![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim64worst_top5.png)
+Best/Worst:
+
+Top 5 worst (MSE)            |  Top 5 best (MSE)
+:-------------------------:|:-------------------------:
+![](https://github.com/stamas02/lesion_coder/blob/main/images/dim512best_top5.png)  |  ![](https://github.com/stamas02/lesion_coder/blob/main/images/dim512worst_top5.png)
 
 
     
