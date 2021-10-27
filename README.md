@@ -94,7 +94,7 @@ Top 5 worst (MSE)            |  Top 5 best (MSE)
 ![](https://github.com/stamas02/lesion_coder/blob/main/images/dim64best_top5.png)  |  ![](https://github.com/stamas02/lesion_coder/blob/main/images/dim64worst_top5.png)
 
 
-### 128 DIM
+### 256 DIM
 Reconstruction:
 
 ![training_loss](https://github.com/stamas02/lesion_coder/blob/main/images/dim128-029_viz.png)
